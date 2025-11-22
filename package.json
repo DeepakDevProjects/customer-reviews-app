@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "npm run build:src && npm run build:mock",
+    "build:src": "tsc -p tsconfig.json",
+    "build:mock": "tsc mock-api/handler.ts --outDir dist/mock-api --module commonjs --target ES2020 --esModuleInterop --resolveJsonModule",
     "mock-api": "ts-node mock-api/server.ts"
   },
   "keywords": [],
@@ -11,10 +13,10 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.668.0",
     "express": "^4.21.2"
   },
   "devDependencies": {
-    "@aws-sdk/client-s3": "^3.668.0",
     "@types/express": "^5.0.0",
     "@types/node": "^24.10.1",
     "ts-node": "^10.9.2",

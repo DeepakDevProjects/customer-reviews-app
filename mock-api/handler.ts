@@ -58,14 +58,35 @@ export const handler = async (event: any) => {
   console.log('Mock API Lambda received:', JSON.stringify(event, null, 2));
 
   // Extract product ID from path: /products/{productId}/reviews
-  const path = event.path || event.rawPath || '';
+  const path = event.path || event.rawPath || event.requestContext?.path || '';
   const match = path.match(/\/products\/([^\/]+)\/reviews/);
+
+  // Handle root path
+  if (path === '/' || path === '') {
+    return {
+      statusCode: 200,
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ 
+        message: 'Customer Reviews Mock API',
+        endpoints: [
+          '/products/product-a/reviews',
+          '/products/product-b/reviews'
+        ]
+      }),
+    };
+  }
 
   if (!match) {
     return {
       statusCode: 400,
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ error: 'Invalid path. Use /products/{productId}/reviews' }),
+      body: JSON.stringify({ 
+        error: 'Invalid path. Use /products/{productId}/reviews',
+        availableEndpoints: [
+          '/products/product-a/reviews',
+          '/products/product-b/reviews'
+        ]
+      }),
     };
   }
 
