@@ -83,27 +83,33 @@ pipeline {
                     def detectedPrNumber = null
                     
                     // Try to extract PR number from branch name
+                    // Use string operations to avoid Matcher serialization issues
                     // Pattern 1: pr-123, PR-456, pr_789
-                    def matcher1 = branchName =~ /(?i)pr[-_]?(\d+)/
-                    if (matcher1.find()) {
-                        detectedPrNumber = matcher1.group(1)
-                        echo "✅ Found PR number using pattern 1: ${detectedPrNumber}"
+                    def lowerBranch = branchName.toLowerCase()
+                    if (lowerBranch.contains('pr')) {
+                        def prIndex = lowerBranch.indexOf('pr')
+                        def afterPr = branchName.substring(prIndex + 2)
+                        def prNumMatch = afterPr.find(/\d+/)
+                        if (prNumMatch) {
+                            detectedPrNumber = prNumMatch
+                            echo "✅ Found PR number using pattern 1: ${detectedPrNumber}"
+                        }
                     }
                     
                     // Pattern 2: Any trailing number
                     if (!detectedPrNumber) {
-                        def matcher2 = branchName =~ /(\d+)$/
-                        if (matcher2.find()) {
-                            detectedPrNumber = matcher2.group(1)
+                        def trailingNum = branchName.find(/\d+$/)
+                        if (trailingNum) {
+                            detectedPrNumber = trailingNum
                             echo "✅ Found PR number using pattern 2: ${detectedPrNumber}"
                         }
                     }
                     
                     // Pattern 3: Any number in branch name
                     if (!detectedPrNumber) {
-                        def matcher3 = branchName =~ /(\d+)/
-                        if (matcher3.find()) {
-                            detectedPrNumber = matcher3.group(1)
+                        def anyNum = branchName.find(/\d+/)
+                        if (anyNum) {
+                            detectedPrNumber = anyNum
                             echo "✅ Found PR number using pattern 3: ${detectedPrNumber}"
                         }
                     }
