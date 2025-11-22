@@ -32,7 +32,7 @@ export const handler = async () => {
       console.log(`Saved fragment: ${key}`);
     }
 
-    return {
+    const response = {
       statusCode: 200,
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
@@ -40,6 +40,11 @@ export const handler = async () => {
         results,
       }),
     };
+    
+    // Log the response so it appears in CloudWatch Logs for EventBridge invocations
+    console.log('Lambda execution completed successfully:', JSON.stringify(response, null, 2));
+    
+    return response;
   } catch (error: any) {
     console.error('Handler error:', error);
     return {
