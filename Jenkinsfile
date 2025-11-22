@@ -62,7 +62,7 @@ pipeline {
                     
                     def branchName = env.GIT_BRANCH ?: env.BRANCH_NAME
                     if (branchName) {
-                        branchName = branchName.replaceFirst(/^origin\//, '')
+                        branchName = branchName.replaceFirst('^origin/', '')
                         echo "Branch from environment: ${branchName}"
                     }
                     
@@ -83,18 +83,28 @@ pipeline {
                     def detectedPrNumber = null
                     
                     // Try to extract PR number from branch name
-                    def patterns = [
-                        /(?i)pr[-_]?(\d+)/,
-                        /(\d+)$/,
-                        /(\d+)/
-                    ]
+                    // Pattern 1: pr-123, PR-456, pr_789
+                    def matcher1 = branchName =~ /(?i)pr[-_]?(\d+)/
+                    if (matcher1.find()) {
+                        detectedPrNumber = matcher1.group(1)
+                        echo "✅ Found PR number using pattern 1: ${detectedPrNumber}"
+                    }
                     
-                    for (pattern in patterns) {
-                        def matcher = branchName =~ pattern
-                        if (matcher.find()) {
-                            detectedPrNumber = matcher.group(1)
-                            echo "✅ Found PR number using pattern ${pattern}: ${detectedPrNumber}"
-                            break
+                    // Pattern 2: Any trailing number
+                    if (!detectedPrNumber) {
+                        def matcher2 = branchName =~ /(\d+)$/
+                        if (matcher2.find()) {
+                            detectedPrNumber = matcher2.group(1)
+                            echo "✅ Found PR number using pattern 2: ${detectedPrNumber}"
+                        }
+                    }
+                    
+                    // Pattern 3: Any number in branch name
+                    if (!detectedPrNumber) {
+                        def matcher3 = branchName =~ /(\d+)/
+                        if (matcher3.find()) {
+                            detectedPrNumber = matcher3.group(1)
+                            echo "✅ Found PR number using pattern 3: ${detectedPrNumber}"
                         }
                     }
                     
@@ -154,7 +164,7 @@ pipeline {
                             script: 'git rev-parse --short HEAD',
                             returnStdout: true
                         ).trim()
-                        def uniqueId = "${branchName}-${commitHash}".replaceAll(/[^a-zA-Z0-9-]/, '-')
+                        def uniqueId = "${branchName}-${commitHash}".replaceAll('[^a-zA-Z0-9-]', '-')
                         detectedPrNumber = uniqueId
                         echo "⚠️ No PR number found, using unique ID: ${detectedPrNumber}"
                     }
