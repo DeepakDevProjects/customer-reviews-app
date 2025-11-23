@@ -20,7 +20,9 @@ const mockData: Record<string, MockDataEntry> = {
     productId: 'product-a',
     productName: 'Wireless Headphones',
     reviews: [
-      { id: 'rev-a-1', author: 'Alice Johnson', rating: 5, comment: 'Amazing sound quality!', createdAt: '2024-11-20T10:30:00Z' },
+      { id: 'rev-a-10', author: 'Chaminda boss', rating: 5, comment: 'Lajawabbbb..', createdAt: '2025-11-20T10:30:00Z' },
+      { id: 'rev-a-11', author: 'Barrmunda', rating: 5, comment: 'munda jabardast hai!', createdAt: '2025-11-20T10:30:00Z' },
+      { id: 'rev-a-12', author: 'Alice Johnson', rating: 5, comment: 'Amazing sound quality!', createdAt: '2024-11-20T10:30:00Z' },
       { id: 'rev-a-2', author: 'Bob Smith', rating: 4, comment: 'Very comfortable, but a bit pricey.', createdAt: '2024-11-19T14:20:00Z' },
       { id: 'rev-a-3', author: 'Carol Lee', rating: 5, comment: 'Best headphones I ever bought.', createdAt: '2024-11-18T12:15:00Z' },
       { id: 'rev-a-4', author: 'David Chen', rating: 4, comment: 'Good battery life, noise cancellation works well.', createdAt: '2024-11-17T16:45:00Z' },
@@ -38,6 +40,7 @@ const mockData: Record<string, MockDataEntry> = {
     productId: 'product-b',
     productName: 'Smart Watch',
     reviews: [
+      { id: 'rev-b-10', author: 'Rahat khan', rating: 5, comment: 'jillelahi!', createdAt: '2025-11-20T11:00:00Z' },
       { id: 'rev-b-1', author: 'Mia Clark', rating: 5, comment: 'Love the fitness tracking features!', createdAt: '2024-11-20T11:00:00Z' },
       { id: 'rev-b-2', author: 'Noah Lewis', rating: 4, comment: 'Great design, battery lasts long.', createdAt: '2024-11-19T13:45:00Z' },
       { id: 'rev-b-3', author: 'Olivia Walker', rating: 5, comment: 'Perfect for my daily workouts.', createdAt: '2024-11-18T10:30:00Z' },
@@ -107,4 +110,3 @@ export const handler = async (event: any) => {
     body: JSON.stringify(data),
   };
 };
-
