@@ -20,6 +20,7 @@ const mockData: Record<string, MockDataEntry> = {
     productId: 'product-a',
     productName: 'Wireless Headphones',
     reviews: [
+      { id: 'rev-a-10', author: 'Done', rating: 5, comment: 'don ko pakadna muskil hai..', createdAt: '2025-11-20T10:30:00Z' },
       { id: 'rev-a-10', author: 'Chaminda boss', rating: 5, comment: 'Lajawabbbb..', createdAt: '2025-11-20T10:30:00Z' },
       { id: 'rev-a-11', author: 'Barrmunda', rating: 5, comment: 'munda jabardast hai!', createdAt: '2025-11-20T10:30:00Z' },
       { id: 'rev-a-12', author: 'Alice Johnson', rating: 5, comment: 'Amazing sound quality!', createdAt: '2024-11-20T10:30:00Z' },
