@@ -242,9 +242,22 @@ pipeline {
                 }
                 withCredentials([string(credentialsId: "${GITHUB_TOKEN_CREDENTIALS_ID}", variable: 'GITHUB_TOKEN')]) {
                     sh '''
-                        # Clone infrastructure repo
-                        git clone https://${GITHUB_TOKEN}@github.com/DeepakDevProjects/customer-reviews-iac.git ${INFRA_REPO_DIR} || true
-                        cd ${INFRA_REPO_DIR}
+                        set -e  # Exit on any error
+                        
+                        echo "PR_NUMBER detected: ${PR_NUMBER}"
+                        echo "Creating config for PR: ${PR_NUMBER}"
+                        
+                        # Clone infrastructure repo (or update if exists)
+                        if [ -d "${INFRA_REPO_DIR}" ]; then
+                            echo "Infrastructure repo already exists, updating..."
+                            cd ${INFRA_REPO_DIR}
+                            git fetch origin
+                            git reset --hard origin/main
+                        else
+                            echo "Cloning infrastructure repo..."
+                            git clone https://${GITHUB_TOKEN}@github.com/DeepakDevProjects/customer-reviews-iac.git ${INFRA_REPO_DIR}
+                            cd ${INFRA_REPO_DIR}
+                        fi
                         
                         # Create config directory for this PR
                         mkdir -p config/pr-${PR_NUMBER}
@@ -263,14 +276,33 @@ pipeline {
 }
 EOF
                         
+                        echo "Config file created: config/pr-${PR_NUMBER}/config.json"
+                        cat config/pr-${PR_NUMBER}/config.json
+                        
                         # Commit and push config
                         git config user.name "Jenkins"
                         git config user.email "jenkins@example.com"
                         git add config/pr-${PR_NUMBER}/config.json
-                        git commit -m "Add PR ${PR_NUMBER} configuration" || echo "No changes to commit"
-                        git push origin main || echo "Push failed (may already exist)"
                         
-                        echo "PR ${PR_NUMBER} configuration created in infrastructure repo"
+                        # Check if there are changes to commit
+                        if git diff --staged --quiet; then
+                            echo "⚠️  No changes to commit (config file may already exist with same content)"
+                        else
+                            echo "Committing config file..."
+                            git commit -m "Add PR ${PR_NUMBER} configuration" || {
+                                echo "❌ Git commit failed!"
+                                exit 1
+                            }
+                            
+                            echo "Pushing to GitHub..."
+                            git push origin main || {
+                                echo "❌ Git push failed! Check GitHub token permissions."
+                                exit 1
+                            }
+                            echo "✅ PR ${PR_NUMBER} configuration pushed successfully"
+                        fi
+                        
+                        echo "✅ PR ${PR_NUMBER} configuration created in infrastructure repo"
                     '''
                 }
             }
