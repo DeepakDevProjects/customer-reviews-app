@@ -1,11 +1,13 @@
 // Lambda handler that fetches reviews for multiple products and saves HTML fragments to S3.
 import { fetchProductReviews } from './reviewsFetcher';
 import { renderProductReviewsHtml } from './reviewsRenderer';
+import { renderMainPageWithEsi } from './mainPageRenderer';
 import { saveReviewFragment } from './storage';
 
 const API_BASE_URL = process.env.API_BASE_URL ?? 'https://api.example.com';
 const PRODUCT_IDS = process.env.PRODUCT_IDS ?? 'product-a,product-b';
 const OUTPUT_BUCKET = process.env.OUTPUT_BUCKET ?? 'customer-reviews-demo';
+const AWS_REGION = process.env.AWS_REGION ?? 'us-east-1';
 
 export const handler = async () => {
   try {
@@ -32,17 +34,37 @@ export const handler = async () => {
       console.log(`Saved fragment: ${key}`);
     }
 
+    // Generate and upload main HTML page with ESI includes
+    console.log('Generating main HTML page with ESI includes...');
+    const mainPageHtml = renderMainPageWithEsi({
+      productIds,
+      bucketName: OUTPUT_BUCKET,
+      bucketRegion: AWS_REGION,
+    });
+    
+    await saveReviewFragment({
+      bucket: OUTPUT_BUCKET,
+      key: 'index.html',
+      html: mainPageHtml,
+    });
+    console.log('Saved main page: index.html');
+
     const response = {
       statusCode: 200,
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
-        message: `Successfully processed ${results.length} product(s)`,
+        message: `Successfully processed ${results.length} product(s) and generated main page`,
         results,
+        mainPage: {
+          key: 'index.html',
+          url: `https://${OUTPUT_BUCKET}.s3.${AWS_REGION}.amazonaws.com/index.html`,
+          status: 'saved',
+        },
       }),
     };
     
     // Log the response so it appears in CloudWatch Logs for EventBridge invocations
-    console.log('Lambda execution completed successfullyyy:', JSON.stringify(response, null, 2));
+    console.log('Lambda execution completed successfully:', JSON.stringify(response, null, 2));
     
     return response;
   } catch (error: any) {
