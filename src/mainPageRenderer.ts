@@ -146,7 +146,7 @@ export const renderMainPageWithEsi = (options: MainPageOptions): string => {
     
     <footer>
         <p>Last updated: <time id="last-update">Loading...</time></p>
-        <p>Reviews are updated every 5 minutes via AWS EventBridge and Lambda</p>
+        <p>Reviews are updated every 1 hour via AWS EventBridge and Lambda</p>
     </footer>
     
     <script>
