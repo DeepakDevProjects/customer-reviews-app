@@ -64,7 +64,7 @@ export const handler = async () => {
     };
     
     // Log the response so it appears in CloudWatch Logs for EventBridge invocations
-    console.log('Lambda execution completed successfully:', JSON.stringify(response, null, 2));
+    console.log('Lambda execution completed successfully - All products processed:', JSON.stringify(response, null, 2));
     
     return response;
   } catch (error: any) {
